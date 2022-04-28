@@ -1,21 +1,23 @@
+// SRAM Module
+
 `timescale 1ns / 1ps
 
-module sram(Cs_b, We_b, Oe_b, Address, IO);
+module sram(Cs_n, We_n, Oe_n, Address, IO);
 
-    input Cs_b, We_b, Oe_b;
+    input Cs_n, We_n, Oe_n;
     input [15:0] Address;
-    input [15:0] IO;
+    inout [15:0] IO;
     
-    reg [7:0] RAM1[255:0];
+    reg [7:0] ram[15:0];
     
-    assign IO = (Cs_b == 1'b1 | We_b == 1'b0 | Oe_b == 1'b1) ? 8'bZZZZZZZZ : RAM1[Address];
+    assign IO = (Cs_n == 1'b1 | We_n == 1'b0 | Oe_n == 1'b1) ? 8'bZZZZZZZZ : ram[Address];
     
-    always @(We_b, Cs_b)
+    always @(We_n, Cs_n)
         begin
-           @(negedge We_b)
-            if (Cs_b == 1'b0)
+           @(negedge We_n)
+            if (Cs_n == 1'b0)
                 begin
-                    RAM1[Address] <= IO; //Write to RAM
+                    ram[Address] <= IO; //Write to RAM
                 end 
         end
 endmodule
