@@ -27,4 +27,5 @@ module hex_code(input [4:0] in,
 	   end
 	 endcase
   end
+  
 endmodule

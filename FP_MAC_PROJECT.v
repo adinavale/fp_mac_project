@@ -2,82 +2,90 @@
 
 `timescale 1ns / 1ps
 
-module FP_MAC_PROJECT(input i_clk, 
-                      input i_rst,
-							 input i_push_btn,
-							 input [7:0] i_keypad,
-                      output [31:0] ssd,
-				          output [4:0] reg arduino;
-							 );
-   
-	// SRAM Connection
-	wire cs_a, cs_b;
-	wire we_a, we_b;
-	wire oe_a, oe_b;
-	wire [3:0] addr;
-	wire [7:0] sram_io;
+module FP_MAC_PROJECT(input clk, rst,
+                      input ns_button,
+                      output [1:0] arduino_out,
+					       output [7:0] hex0_disp,
+					       output [7:0] hex1_disp,
+					       output [7:0] hex2_disp,
+					       output [7:0] hex3_disp);
 	
-	// HEX Connections
-	reg [3:0] hex0_in, hex1_in, hex2_in, hex3_in;
-	
-	// SRAM Instances
-	sram sram_a(.Cs_n(cs_a), .We_n(we_a), .Oe_n(oe_a), .Address(addr), .IO(sram_io));
-	sram sram_b(.Cs_n(cs_b), .We_n(we_b), .Oe_n(oe_b), .Address(addr), .IO(sram_io));
-	
-	//Hex display instances
-	hex_code hex0(.in(), .out(ssd[7:0]));
-   hex_code hex1(.in(), .out(ssd[15:8]));
-   hex_code hex2(.in(), .out(ssd[23:16]))
-   hex_code hex3(.in(), .out(ssd[31:24]))	
-	
-	// State Parameter
-	parameter STATE_RST = 2'b00, STATE_SRAM_A = 2'b01, STATE_SRAM_B = 2'b10, STATE_MAC_CALC = 2'b11;
-	
-   // State Registers	
-	reg [1:0] curr_state, next_state;
+	//Parameters
+	parameter RESET = 2'b00, INPUT_1 = 2'b01, INPUT_2 = 2'b10, RESULT = 2'b11;
 
-	// SM : Sequential Logic
-   always @ (posedge i_push_btn or negedge i_rst)
-   begin
-	  if(i_rst == 0)
-	  begin
-	    curr_state <= STATE_RST;
-	  end
-	  else 
-	  begin
-	    curr_state <= next_state;
-	  end
-   end
+	//Regs and Wires
+   reg [1:0]  curr_state, next_state;
+	reg [1:0]  arduino_out_q;
+	reg [31:0] hex_display_q;
+	reg [15:0] in1, in2;
+	reg [31:0] mult;
+	reg [15:0] mult_norm;
 	
-	//SM :Combination Logic
-	always @ (curr_state)
+	//Assign Statements
+	assign arduino_out = arduino_out_q;
+	
+	//Module Instances
+	hex_code hex0(.in(hex_display_q[07:00]), .out(hex0_disp));
+	hex_code hex1(.in(hex_display_q[15:08]), .out(hex1_disp));
+	hex_code hex2(.in(hex_display_q[23:16]), .out(hex2_disp));
+	hex_code hex3(.in(hex_display_q[31:24]), .out(hex3_disp));
+	
+	
+	//FSMs
+	always @ (posedge clk or negedge rst)
 	begin
+	  if(!rst) curr_state <= RESET;
+	  else curr_state <= next_state;
+	end
+	
+	always @ (curr_state or ns_button)
+	begin
+	  
+	  arduino_out_q = 0;
+	  hex_display_q = 0;
+	  
 	  case(curr_state)
-	    STATE_RST :
+	    RESET :
 		   begin
-			  // Display Reset on LCD
-			  arduino = 5'b0_0000;
-			  
-			  // SET SSD to 0
-			  hex0_in = 5'b1_0000;
-			  hex1_in = 5'b1_0000;
-			  hex2_in = 5'b1_0000;
-			  hex3_in = 5'b1_0000;
-			  
-			  next_state = STATE_SRAM_A;
+			  arduino_out_q = RESET;
+			  hex_display_q = 32'hFFFF_FFFF; // BLANK 7-SegD
+			  mult = 0;
+			  mult_norm = 0;
+			  next_state = INPUT_1;
 			end
-		 STATE_SRAM_A :
+		 INPUT_1 :
 		   begin
-			  next_state = STATE_SRAM_B; 
+			  arduino_out_q = INPUT_1;
+			  in1 = 16'h4480; //4.5
+			  hex_display_q = in1;
+			  next_state = INPUT_2;
 			end
-		 STATE_SRAM_B :
+		 INPUT_2 :
 		   begin
-			  next_state = STATE_MAC_CALC; 
+			  arduino_out_q = INPUT_2;
+			  in2 = 16'hFE80; //-0.75
+			  hex_display_q = in2;
+			  next_state = RESULT;
 			end
-		 STATE_MAC_CALC :
+		 RESULT : 
 		   begin
+			  arduino_out_q = RESULT;
+			  mult = in1 * in2;
 			  
+			  //Check for Saturation
+			  case({in1[15],in2[15]})
+			    2'b00 : mult_norm = (mult[31:24] != 0) ? 16'h7FFF : mult[24:9];
+				 2'b01 : mult_norm = (mult[31:24] != 1) ? 16'h8001 : mult[24:9];
+				 2'b10 : mult_norm = (mult[31:24] != 1) ? 16'h8001 : mult[24:9];
+				 2'b11 : mult_norm = (mult[31:24] != 0) ? 16'h7FFF : mult[24:9];
+			  endcase
+			  
+			  hex_display_q = mult_norm;
+			  next_state = RESULT;
 			end
 	  endcase
+	  
 	end
-endmodule 
+	
+endmodule
+
