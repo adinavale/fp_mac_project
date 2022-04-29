@@ -1,9 +1,10 @@
 //MAC Module
 
-module MAC (input clk, rst, input [3:0] A, B, output reg [10:0] ACC_Result);
+module MAC (input clk, rst, input [15:0] A, B, 
+            output reg [15:0] ACC_Result);
 
-  reg  [3:0] In1, In2;
-  reg  [7:0] mult;
+  reg  [15:0] In1, In2;
+  reg  [31:0] mult;
 
 
   always @(posedge clk or posedge rst)
