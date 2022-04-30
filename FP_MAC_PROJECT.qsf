@@ -44,14 +44,73 @@ set_global_assignment -name ORIGINAL_QUARTUS_VERSION 21.1.0
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "11:02:52  APRIL 26, 2022"
 set_global_assignment -name LAST_QUARTUS_VERSION "21.1.0 Lite Edition"
 set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
+set_global_assignment -name NUM_PARALLEL_PROCESSORS 2
 set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
 set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
 set_global_assignment -name ERROR_CHECK_FREQUENCY_DIVISOR 256
-set_global_assignment -name VERILOG_FILE sram.v
-set_global_assignment -name VERILOG_FILE FP_MAC_PROJECT.v
-set_global_assignment -name VERILOG_FILE hex_code.v
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+set_global_assignment -name VERILOG_FILE KeyPadInterpreter.v
+set_global_assignment -name VERILOG_FILE PulseCounter.v
+set_global_assignment -name VERILOG_FILE LFSR25000.v
+set_global_assignment -name VERILOG_FILE KeyPadScanner.v
+set_global_assignment -name VERILOG_FILE KeyPadDecoder.v
+set_global_assignment -name VERILOG_FILE sram.v
+set_global_assignment -name VERILOG_FILE FP_MAC_PROJECT.v
+set_global_assignment -name VERILOG_FILE hex_code.v
 set_global_assignment -name VERILOG_FILE mac.v
+set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
+set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
+set_global_assignment -name VERILOG_FILE keyboard_read.v
+set_location_assignment PIN_B8 -to rst
+set_location_assignment PIN_A7 -to ns_button
+set_location_assignment PIN_C14 -to hex0_disp[0]
+set_location_assignment PIN_E15 -to hex0_disp[1]
+set_location_assignment PIN_C15 -to hex0_disp[2]
+set_location_assignment PIN_C16 -to hex0_disp[3]
+set_location_assignment PIN_E16 -to hex0_disp[4]
+set_location_assignment PIN_D17 -to hex0_disp[5]
+set_location_assignment PIN_C17 -to hex0_disp[6]
+set_location_assignment PIN_D15 -to hex0_disp[7]
+set_location_assignment PIN_C18 -to hex1_disp[0]
+set_location_assignment PIN_D18 -to hex1_disp[1]
+set_location_assignment PIN_E18 -to hex1_disp[2]
+set_location_assignment PIN_B16 -to hex1_disp[3]
+set_location_assignment PIN_A17 -to hex1_disp[4]
+set_location_assignment PIN_A18 -to hex1_disp[5]
+set_location_assignment PIN_B17 -to hex1_disp[6]
+set_location_assignment PIN_A16 -to hex1_disp[7]
+set_location_assignment PIN_B20 -to hex2_disp[0]
+set_location_assignment PIN_A20 -to hex2_disp[1]
+set_location_assignment PIN_B19 -to hex2_disp[2]
+set_location_assignment PIN_A21 -to hex2_disp[3]
+set_location_assignment PIN_B21 -to hex2_disp[4]
+set_location_assignment PIN_C22 -to hex2_disp[5]
+set_location_assignment PIN_B22 -to hex2_disp[6]
+set_location_assignment PIN_A19 -to hex2_disp[7]
+set_location_assignment PIN_F21 -to hex3_disp[0]
+set_location_assignment PIN_E22 -to hex3_disp[1]
+set_location_assignment PIN_E21 -to hex3_disp[2]
+set_location_assignment PIN_C19 -to hex3_disp[3]
+set_location_assignment PIN_C20 -to hex3_disp[4]
+set_location_assignment PIN_D19 -to hex3_disp[5]
+set_location_assignment PIN_E17 -to hex3_disp[6]
+set_location_assignment PIN_D22 -to hex3_disp[7]
+set_location_assignment PIN_W11 -to key_col[0]
+set_location_assignment PIN_AA10 -to key_col[1]
+set_location_assignment PIN_Y8 -to key_col[2]
+set_location_assignment PIN_Y7 -to key_col[3]
+set_location_assignment PIN_AA15 -to key_row[0]
+set_location_assignment PIN_W13 -to key_row[1]
+set_location_assignment PIN_AB13 -to key_row[2]
+set_location_assignment PIN_Y11 -to key_row[3]
+set_location_assignment PIN_P11 -to clk
+set_location_assignment PIN_W5 -to arduino_out[0]
+set_location_assignment PIN_AA14 -to arduino_out[1]
+set_location_assignment PIN_W12 -to arduino_out[2]
+set_location_assignment PIN_AB12 -to arduino_out[3]
+set_location_assignment PIN_AB11 -to arduino_out[4]
+
+
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
