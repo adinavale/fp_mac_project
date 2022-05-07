@@ -2,3 +2,13 @@ db/
 incremental_db/
 output_files/
 *.bak
+*.swp
+*.swo
+change
+csrc
+*.log
+simv
+simv.daidir
+ucli.key
+vc_hdrs.h
+waves.vcd
