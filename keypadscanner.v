@@ -1,8 +1,9 @@
 module KeyPadScanner(input reset,
   input KeyRd,
   input Clock, 
-  input [3:0]RowIn, 
+  input [3:0] RowIn, 
   output [3:0] ColOut, 
+  output ready,
   output reg[15:0] mem_reg);
   
   parameter Scan=3'b000, Calculate=3'b001, Analyze=3'b010, WaitForRead=3'b011, Display=3'b100;
@@ -14,16 +15,19 @@ module KeyPadScanner(input reset,
   reg waitbit;
   reg [1:0] display_id;
   reg[3:0] data_reg;
+  reg ready_q;
   
   /*Column out to the hexpad*/
   assign ColOut[0] = Col[0] ? 1'bz : 1'b0; 
   assign ColOut[1] = Col[1] ? 1'bz : 1'b0; 
   assign ColOut[2] = Col[2] ? 1'bz : 1'b0; 
   assign ColOut[3] = Col[3] ? 1'bz : 1'b0; 
+  assign ready = ready_q;
   
   /*Key pad scanner module*/
   always @(posedge Clock or posedge reset) 
   begin
+    ready_q = 0;
     if (reset == 1 ) 
     begin
       HexState <= Scan;
@@ -151,6 +155,7 @@ module KeyPadScanner(input reset,
             3 : 
             begin 
               mem_reg[3:0]=data_reg; 
+              ready_q = 1;
             end//LSB
             2 : 
             begin 

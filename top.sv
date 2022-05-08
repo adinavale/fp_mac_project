@@ -25,7 +25,7 @@ module top();
     ns_button = 1;
 
 
-    repeat(1000000) @ (posedge clk);
+    repeat(100) @ (posedge clk);
     ns_button = 0;
     @(negedge clk);
     ns_button = 1;
@@ -40,12 +40,10 @@ module top();
 
   always @ (key_col)
   begin
-		case(key_col) 
-			4'bzzz0: key_row = 4'b1111;
-			4'bzz0z: key_row = 4'b1111;
-			4'bz0zz: key_row = 4'b1101;
-			4'b0zzz: key_row = 4'b1111;
-		endcase
+		if(key_col === 4'bzzz0) key_row = 4'b1111;
+		if(key_col === 4'bzz0z) key_row = 4'b1111;
+		if(key_col === 4'bz0zz) key_row = 4'b1101;
+		if(key_col === 4'b0zzz) key_row = 4'b1111;
   end
 
   initial

@@ -10,7 +10,7 @@ module sram(Cs_n, We_n, Oe_n, Address, IO);
     
     reg [15:0] ram[7:0];
     
-    assign IO = (Cs_n == 1'b1 | We_n == 1'b0 | Oe_n == 1'b1) ? 8'bZZZZZZZZ : ram[Address];
+    assign IO = (Cs_n == 1'b1 | We_n == 1'b0 | Oe_n == 1'b1) ? 16'hzzzz : ram[Address];
     
     always @(We_n, Cs_n)
         begin

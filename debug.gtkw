@@ -1,31 +1,29 @@
 [*]
 [*] GTKWave Analyzer v3.3.61 (w)1999-2014 BSI
-[*] Wed May  4 19:48:10 2022
+[*] Sat May  7 06:40:52 2022
 [*]
 [dumpfile] "/home/014558648/Documents/EE271_DLD/project/fp_mac_project/waves.vcd"
-[dumpfile_mtime] "Wed May  4 19:45:10 2022"
-[dumpfile_size] 463632
+[dumpfile_mtime] "Sat May  7 06:39:25 2022"
+[dumpfile_size] 4392789
 [savefile] "/home/014558648/Documents/EE271_DLD/project/fp_mac_project/debug.gtkw"
 [timestart] 0
-[size] 1680 947
-[pos] -39 -39
-*-25.056818 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[size] 3008 1589
+[pos] -1 -1
+*-18.935904 170000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top.
+[treeopen] top.dut.
 [sst_width] 377
-[signals_width] 158
+[signals_width] 498
 [sst_expanded] 1
 [sst_vpaned_height] 260
 @28
 top.dut.clk
 top.dut.rst
+top.dut.curr_state[1:0]
+top.dut.curr_state_sram[2:0]
+top.dut.next_state[1:0]
+top.dut.next_state_sram[2:0]
+@29
 top.dut.ns_button
-@22
-top.dut.key_row[3:0]
-top.dut.key_col[3:0]
-top.dut.arduino_out[4:0]
-top.dut.hex0_disp[7:0]
-top.dut.hex1_disp[7:0]
-top.dut.hex2_disp[7:0]
-top.dut.hex3_disp[7:0]
 [pattern_trace] 1
 [pattern_trace] 0
