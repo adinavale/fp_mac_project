@@ -5,7 +5,7 @@
 `include "hex_code.v"
 `include "sram.v"
 `include "keypadscanner.v"
-`include "mac.v"
+`include "mac_wrapper.v"
 
 module FP_MAC_PROJECT(input clk, 
   input rst,
@@ -34,6 +34,8 @@ module FP_MAC_PROJECT(input clk,
   reg oe_a_q, oe_b_q;
 
   reg key_en;
+
+  reg [2:0] mac_counter;
   
   wire cs_a, we_a, oe_a;
   wire cs_b, we_b, oe_b;
@@ -51,7 +53,7 @@ module FP_MAC_PROJECT(input clk,
   
   assign hex_display_in = (key_en) ? {1'b0, key_data[15:12], 1'b0, key_data[11:8], 1'b0, key_data[7:4], 1'b0, key_data[3:0] } : hex_display_q;
   
-  assign sram_addr = curr_state_sram;
+  assign sram_addr = curr_state_sram + mac_counter;
   assign sram_data_a = (curr_state == SRAM_A) ? key_data : 16'hz;
   assign sram_data_b = (curr_state == SRAM_B) ? key_data : 16'hz;
   assign cs_a   = (curr_state == SRAM_A || curr_state == RESULT) ? 1'b0 : 1'b1;
@@ -77,9 +79,9 @@ module FP_MAC_PROJECT(input clk,
   
   //Keyboard
   KeyPadScanner keyboard (.Clock(clk), .reset(~key_en), .RowIn(key_row),   .ColOut(key_col),  .KeyRd(key_en),  .ready(wr_e), .mem_reg(key_data));
-  
-  //MAC
-  MAC mac(.clk(clk), .rst(mac_rst), .A(sram_data_a), .B(sram_data_b), .ACC_Result(mac_result));
+
+  //Mac_Wrapper 
+ mac_wrapper mac_wrap(.clk(clk), .reset(mac_rst), .A(sram_data_a), .B(sram_data_b), .counter(mac_counter), .mac_result(mac_result));
   
   //FSMs
   
@@ -233,65 +235,8 @@ module FP_MAC_PROJECT(input clk,
       end
       RESULT : 
       begin
-        case(curr_state_sram)
-          INPUT_0 :
-          begin
-            
-            next_state = RESULT;
-            next_state_sram = INPUT_1;
-            
-          end
-          INPUT_1 :
-          begin
-            
-            next_state = RESULT;
-            next_state_sram = INPUT_2;
-            
-          end 
-          INPUT_2 :
-          begin
-            
-            next_state = RESULT;
-            next_state_sram = INPUT_3;
-            
-          end
-          INPUT_3 :
-          begin
-            
-            next_state = RESULT;
-            next_state_sram = INPUT_4;
-            
-          end
-          INPUT_4 :
-          begin
-            
-            next_state = RESULT;
-            next_state_sram = INPUT_5;
-            
-          end
-          INPUT_5 :
-          begin
-            
-            next_state = RESULT;
-            next_state_sram = INPUT_6;
-            
-          end
-          INPUT_6 :
-          begin
-            
-            next_state = RESULT;
-            next_state_sram = INPUT_7;
-            
-          end
-          INPUT_7 :
-          begin
-            
-            next_state = RESULT;
-            next_state_sram = INPUT_7;
-            
-          end
-        endcase
- 
+        next_state = RESULT;
+        next_state_sram = INPUT_0;
       end
     endcase
   end
