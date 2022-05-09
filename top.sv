@@ -25,10 +25,13 @@ module top();
     ns_button = 1;
 
 
-    repeat(100) @ (posedge clk);
-    ns_button = 0;
-    @(negedge clk);
-    ns_button = 1;
+    repeat(20)
+    begin
+      repeat(100) @ (posedge clk);
+      ns_button = 0;
+      @(negedge clk);
+      ns_button = 1;
+    end
   end
 
   initial

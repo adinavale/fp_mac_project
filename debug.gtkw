@@ -1,21 +1,21 @@
 [*]
 [*] GTKWave Analyzer v3.3.61 (w)1999-2014 BSI
-[*] Sat May  7 06:40:52 2022
+[*] Mon May  9 01:53:10 2022
 [*]
 [dumpfile] "/home/014558648/Documents/EE271_DLD/project/fp_mac_project/waves.vcd"
-[dumpfile_mtime] "Sat May  7 06:39:25 2022"
-[dumpfile_size] 4392789
+[dumpfile_mtime] "Mon May  9 01:46:36 2022"
+[dumpfile_size] 2918408
 [savefile] "/home/014558648/Documents/EE271_DLD/project/fp_mac_project/debug.gtkw"
 [timestart] 0
 [size] 3008 1589
-[pos] -1 -1
-*-18.935904 170000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] -39 -39
+*-22.461336 170000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top.
 [treeopen] top.dut.
 [sst_width] 377
 [signals_width] 498
 [sst_expanded] 1
-[sst_vpaned_height] 260
+[sst_vpaned_height] 902
 @28
 top.dut.clk
 top.dut.rst
@@ -23,7 +23,30 @@ top.dut.curr_state[1:0]
 top.dut.curr_state_sram[2:0]
 top.dut.next_state[1:0]
 top.dut.next_state_sram[2:0]
-@29
 top.dut.ns_button
+@22
+top.dut.arduino_out[4:0]
+top.dut.hex0_disp[7:0]
+top.dut.hex1_disp[7:0]
+top.dut.hex2_disp[7:0]
+top.dut.hex3_disp[7:0]
+@28
+top.dut.key_en
+top.dut.cs_a
+top.dut.cs_b
+top.dut.we_a
+top.dut.we_b
+@22
+top.dut.key_data[15:0]
+top.dut.sram_addr[3:0]
+top.dut.sram_data_a[15:0]
+top.dut.sram_data_b[15:0]
+@28
+top.dut.oe_a
+top.dut.oe_b
+@29
+top.dut.mac_rst
+@22
+top.dut.mac_result[15:0]
 [pattern_trace] 1
 [pattern_trace] 0

@@ -160,14 +160,17 @@ module KeyPadScanner(input reset,
             2 : 
             begin 
               mem_reg[7:4]=data_reg;
+              ready_q = 1;
             end
             1 : 
             begin
               mem_reg[11:8]=data_reg;
+              ready_q = 1;
             end
             0 : 
             begin 
               mem_reg[15:12]=data_reg;
+              ready_q = 1;
             end //MSB
           endcase
           display_id = display_id +1;			

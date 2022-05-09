@@ -5,6 +5,7 @@
 `include "hex_code.v"
 `include "sram.v"
 `include "keypadscanner.v"
+`include "mac.v"
 
 module FP_MAC_PROJECT(input clk, 
   input rst,
@@ -25,11 +26,12 @@ module FP_MAC_PROJECT(input clk,
   parameter INPUT_0 = 3'b000, INPUT_1 = 3'b001, INPUT_2 = 3'b010, INPUT_3 = 3'b011, INPUT_4 = 3'b100, INPUT_5 = 3'b101, INPUT_6 = 3'b110, INPUT_7 = 3'b111; 
   
   //Regs and Wires
-  reg [1:0]  curr_state, next_state;
-  reg [2:0]  curr_state_sram, next_state_sram;
+  reg [1:0]  curr_state, next_state, next_state_q;
+  reg [2:0]  curr_state_sram, next_state_sram, next_state_sram_q;
   
   reg [4:0]  arduino_out_q;
   reg [19:0] hex_display_q;
+  reg oe_a_q, oe_b_q;
 
   reg key_en;
   
@@ -40,7 +42,9 @@ module FP_MAC_PROJECT(input clk,
   wire [15:0] key_data, sram_data_a, sram_data_b;
   
   wire [19:0] hex_display_in;
-  
+
+  wire mac_rst;
+  wire [15:0] mac_result;
   
   //Assign Statements
   assign arduino_out = arduino_out_q;
@@ -48,15 +52,18 @@ module FP_MAC_PROJECT(input clk,
   assign hex_display_in = (key_en) ? {1'b0, key_data[15:12], 1'b0, key_data[11:8], 1'b0, key_data[7:4], 1'b0, key_data[3:0] } : hex_display_q;
   
   assign sram_addr = curr_state_sram;
-  assign sram_data_a = key_data;
-  assign sram_data_b = key_data;
+  assign sram_data_a = (curr_state == SRAM_A) ? key_data : 16'hz;
+  assign sram_data_b = (curr_state == SRAM_B) ? key_data : 16'hz;
+  assign cs_a   = (curr_state == SRAM_A || curr_state == RESULT) ? 1'b0 : 1'b1;
+  assign cs_b   = (curr_state == SRAM_B || curr_state == RESULT) ? 1'b0 : 1'b1;
+  assign we_a   = (curr_state == SRAM_A) ? ns_button : 1'b1;
+  assign we_b   = (curr_state == SRAM_B) ? ns_button : 1'b1;
+  assign oe_a   = (curr_state == RESULT) ? 1'b0 : 1'b1; 
+  assign oe_b   = (curr_state == RESULT) ? 1'b0 : 1'b1; 
   
-  // assign key_en = (curr_state == SRAM_A || curr_state == SRAM_B) ? 1'b1 : 1'b0;
-  assign cs_a   = (curr_state == SRAM_A || curr_state == RESULT) ? 1'b1 : 1'b0;
-  assign we_a   = (curr_state == SRAM_A) ? wr_e : 4'bz;
-  assign we_b   = (curr_state == SRAM_B) ? wr_e : 4'bz;
-  
-  
+  assign mac_rst = (curr_state == RESULT) ? 1'b0 : 1'b1;
+
+
   //Module Instances//
   //HEX Display
   hex_code hex0(.in(hex_display_in[04:00]), .out(hex0_disp));
@@ -71,6 +78,9 @@ module FP_MAC_PROJECT(input clk,
   //Keyboard
   KeyPadScanner keyboard (.Clock(clk), .reset(~key_en), .RowIn(key_row),   .ColOut(key_col),  .KeyRd(key_en),  .ready(wr_e), .mem_reg(key_data));
   
+  //MAC
+  MAC mac(.clk(clk), .rst(mac_rst), .A(sram_data_a), .B(sram_data_b), .ACC_Result(mac_result));
+  
   //FSMs
   
   // Seq Logic
@@ -80,14 +90,18 @@ module FP_MAC_PROJECT(input clk,
     begin
       curr_state <= RESET;
       curr_state_sram <= INPUT_0;
+      next_state_q <= RESET;
+      next_state_sram_q <= RESET;
     end
     else
     begin 
       if(ns_button == 0)
       begin
-        curr_state <= next_state;
-        curr_state_sram <= next_state_sram;
+        next_state_q <= next_state;
+        next_state_sram_q <= next_state_sram;
       end
+        curr_state <= next_state_q;
+        curr_state_sram <= next_state_sram_q;
     end
   end
   
@@ -95,9 +109,11 @@ module FP_MAC_PROJECT(input clk,
   always @ (curr_state or curr_state_sram)
   begin
     
-    arduino_out_q = curr_state + curr_state_sram;
+    arduino_out_q = curr_state * 5'h8 + curr_state_sram;
     hex_display_q = 20'h0;
     key_en = 0;
+    oe_a_q = 0;
+    oe_b_q = 0;
     
     case(curr_state)
       RESET :
@@ -128,42 +144,36 @@ module FP_MAC_PROJECT(input clk,
             key_en = 1;
             next_state = SRAM_A;
             next_state_sram = INPUT_3;
-            
           end
           INPUT_3 :
           begin
-            
+            key_en = 1;
             next_state = SRAM_A;
             next_state_sram = INPUT_4;
-            
           end
           INPUT_4 :
           begin
-            
+            key_en = 1;
             next_state = SRAM_A;
             next_state_sram = INPUT_5;
-            
           end
           INPUT_5 :
           begin
-            
+            key_en = 1;
             next_state = SRAM_A;
             next_state_sram = INPUT_6;
-            
           end
           INPUT_6 :
           begin
-            
+            key_en = 1;
             next_state = SRAM_A;
             next_state_sram = INPUT_7;
-            
           end
           INPUT_7 :
           begin
-            
+            key_en = 1;
             next_state = SRAM_B;
             next_state_sram = INPUT_0;
-            
           end
         endcase
       end
@@ -172,59 +182,51 @@ module FP_MAC_PROJECT(input clk,
         case(curr_state_sram)
           INPUT_0 :
           begin
-            
-            next_state = SRAM_A;
+            key_en = 1;
+            next_state = SRAM_B;
             next_state_sram = INPUT_1;
-            
           end
           INPUT_1 :
           begin
-            
-            next_state = SRAM_A;
+            key_en = 1;
+            next_state = SRAM_B;
             next_state_sram = INPUT_2;
-            
           end 
           INPUT_2 :
           begin
-            
-            next_state = SRAM_A;
+            key_en = 1;
+            next_state = SRAM_B;
             next_state_sram = INPUT_3;
-            
           end
           INPUT_3 :
           begin
-            
-            next_state = SRAM_A;
+            key_en = 1;
+            next_state = SRAM_B;
             next_state_sram = INPUT_4;
-            
           end
           INPUT_4 :
           begin
-            
-            next_state = SRAM_A;
+            key_en = 1;
+            next_state = SRAM_B;
             next_state_sram = INPUT_5;
-            
           end
           INPUT_5 :
           begin
-            
-            next_state = SRAM_A;
+            key_en = 1;
+            next_state = SRAM_B;
             next_state_sram = INPUT_6;
-            
           end
           INPUT_6 :
           begin
-            
-            next_state = SRAM_A;
+            key_en = 1;
+            next_state = SRAM_B;
             next_state_sram = INPUT_7;
-            
           end
           INPUT_7 :
           begin
-            
-            next_state = SRAM_B;
+            key_en = 1;
+            next_state = RESULT;
             next_state_sram = INPUT_0;
-            
           end
         endcase
  
@@ -235,57 +237,57 @@ module FP_MAC_PROJECT(input clk,
           INPUT_0 :
           begin
             
-            next_state = SRAM_A;
+            next_state = RESULT;
             next_state_sram = INPUT_1;
             
           end
           INPUT_1 :
           begin
             
-            next_state = SRAM_A;
+            next_state = RESULT;
             next_state_sram = INPUT_2;
             
           end 
           INPUT_2 :
           begin
             
-            next_state = SRAM_A;
+            next_state = RESULT;
             next_state_sram = INPUT_3;
             
           end
           INPUT_3 :
           begin
             
-            next_state = SRAM_A;
+            next_state = RESULT;
             next_state_sram = INPUT_4;
             
           end
           INPUT_4 :
           begin
             
-            next_state = SRAM_A;
+            next_state = RESULT;
             next_state_sram = INPUT_5;
             
           end
           INPUT_5 :
           begin
             
-            next_state = SRAM_A;
+            next_state = RESULT;
             next_state_sram = INPUT_6;
             
           end
           INPUT_6 :
           begin
             
-            next_state = SRAM_A;
+            next_state = RESULT;
             next_state_sram = INPUT_7;
             
           end
           INPUT_7 :
           begin
             
-            next_state = SRAM_B;
-            next_state_sram = INPUT_0;
+            next_state = RESULT;
+            next_state_sram = INPUT_7;
             
           end
         endcase
