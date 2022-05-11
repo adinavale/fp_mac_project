@@ -1,4 +1,6 @@
+`ifdef VERIF
 `include "mac.v"
+`endif
 
 module mac_wrapper(input clk, reset, 
   input [15:0] A, B,

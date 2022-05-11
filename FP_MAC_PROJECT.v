@@ -2,10 +2,12 @@
 
 `timescale 1ns / 1ps
 
+`ifdef VERIF
 `include "hex_code.v"
 `include "sram.v"
 `include "keypadscanner.v"
 `include "mac_wrapper.v"
+`endif
 
 module FP_MAC_PROJECT(input clk, 
   input rst,
