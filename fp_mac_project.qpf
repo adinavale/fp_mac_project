@@ -19,13 +19,13 @@
 #
 # Quartus Prime
 # Version 21.1.0 Build 842 10/21/2021 SJ Lite Edition
-# Date created = 11:02:52  April 26, 2022
+# Date created = 19:52:45  May 11, 2022
 #
 # -------------------------------------------------------------------------- #
 
 QUARTUS_VERSION = "21.1"
-DATE = "11:02:52  April 26, 2022"
+DATE = "19:52:45  May 11, 2022"
 
 # Revisions
 
-PROJECT_REVISION = "FP_MAC_PROJECT"
+PROJECT_REVISION = "fp_mac_project"
