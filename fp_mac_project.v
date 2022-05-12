@@ -39,12 +39,15 @@ module fp_mac_project(input clk,
   wire [15:0] hex_display_in;
   
   wire key_en;
-  wire [3:0] row_in_db;
   
   wire cs_a, we_a, oe_a;
   wire cs_b, we_b, oe_b;
   wire [3:0] sram_addr; 
   wire [15:0] key_data, sram_data_a, sram_data_b;
+  
+  wire mac_en;
+  wire [3:0] mac_counter;
+  wire [15:0] mac_result;
   
   //###########################################################################
   // Assign Statements
@@ -53,14 +56,14 @@ module fp_mac_project(input clk,
   assign arduino_out = {curr_state, curr_state_sram};
   
   assign hex_display_in = (curr_state == RESET) ? 16'h0 :
-                          (curr_state == SRAM_A || curr_state == SRAM_B) ? key_data :
-  								  sram_data_b;
+                          (curr_state == SRAM_A || curr_state == SRAM_B) ? key_data : mac_result;
   
   assign key_en = (curr_state == SRAM_A || curr_state == SRAM_B) ? 1'b1 : 1'b0;
   
   assign led = {4'b0, clk_1mhz, key_en, key_data[3:0]};
   
-  assign sram_addr = curr_state_sram;
+  assign sram_addr = (curr_state == RESULT) ? mac_counter : curr_state_sram;
+  
   assign sram_data_a = (curr_state == SRAM_A) ? key_data : 16'hz;
   assign sram_data_b = (curr_state == SRAM_B) ? key_data : 16'hz;
   
@@ -71,6 +74,8 @@ module fp_mac_project(input clk,
   assign oe_a   = (curr_state == RESULT) ? 1'b0 : 1'b1; 
   assign oe_b   = (curr_state == RESULT) ? 1'b0 : 1'b1; 
   
+  assign mac_en = (curr_state == RESULT) ? 1'b1 : 1'b0;
+  
   //###########################################################################
   // Module instances
   //###########################################################################
@@ -80,11 +85,6 @@ module fp_mac_project(input clk,
   
   //Debounce
   debounce db_ns_button(.clk(clk), .in(ns_button), .out(ns_button_db));
-  
-  debounce db_row_in0(.clk(clk), .in(row_in[0]), .out(row_in_db[0]));
-  debounce db_row_in1(.clk(clk), .in(row_in[1]), .out(row_in_db[1]));
-  debounce db_row_in2(.clk(clk), .in(row_in[2]), .out(row_in_db[2]));
-  debounce db_row_in3(.clk(clk), .in(row_in[3]), .out(row_in_db[3]));
   
   //HEX Display
   hex_code hex0(.in(hex_display_in[03:00]), .out(hex0_disp));
@@ -98,6 +98,10 @@ module fp_mac_project(input clk,
   //SRAM
   sram sram_a(.Cs_n(cs_a), .We_n(we_a), .Oe_n(oe_a), .Address(sram_addr), .IO(sram_data_a));
   sram sram_b(.Cs_n(cs_b), .We_n(we_b), .Oe_n(oe_b), .Address(sram_addr), .IO(sram_data_b));
+  
+  //MAC
+  mac_wrapper mac_wap(.clk(clk), .reset(mac_en), .A(sram_data_a), .B(sram_data_b), .counter(mac_counter),.mac_result(mac_result));
+
   
   //###########################################################################
   // State Machines
@@ -221,48 +225,8 @@ module fp_mac_project(input clk,
       end
       RESULT : 
       begin
-        case(curr_state_sram)
-          INPUT_0 :
-          begin
-            next_state = RESULT;
-            next_state_sram = INPUT_1;
-          end
-          INPUT_1 :
-          begin
-            next_state = RESULT;
-            next_state_sram = INPUT_2;
-          end 
-          INPUT_2 :
-          begin
-            next_state = RESULT;
-            next_state_sram = INPUT_3;
-          end
-          INPUT_3 :
-          begin
-            next_state = RESULT;
-            next_state_sram = INPUT_4;
-          end
-          INPUT_4 :
-          begin
-            next_state = RESULT;
-            next_state_sram = INPUT_5;
-          end
-          INPUT_5 :
-          begin
-            next_state = RESULT;
-            next_state_sram = INPUT_6;
-          end
-          INPUT_6 :
-          begin
-            next_state = RESULT;
-            next_state_sram = INPUT_7;
-          end
-          INPUT_7 :
-			 begin
-            next_state = RESULT;
-            next_state_sram = INPUT_7;
-          end
-        endcase
+        next_state = RESULT;
+        next_state_sram = INPUT_7;
       end
     endcase
   end
