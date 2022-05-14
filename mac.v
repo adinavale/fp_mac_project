@@ -1,6 +1,6 @@
 //MAC Module
-module MAC (input clk, rst, 
-            input signed [15:0] A, B, 
+module MAC (input clk, rst,
+            input signed [15:0] A, B,
             output reg [15:0] acc_result);
 
   reg signed [15:0] In1, In2, mult_norm;
@@ -25,10 +25,10 @@ module MAC (input clk, rst,
       acc_result <= add_norm(acc_result, mult_norm);
     end
   end
-  
+
   function [15:0] mult_norm_rnd(input [31:0] num);
     begin
-      
+
       mult_norm_rnd = 16'h0;
 
       if(num[9:6] != 4'b0100)
@@ -42,7 +42,7 @@ module MAC (input clk, rst,
       end
       else if(num[24] === 1 && num[31:24] !== 8'hFF)
       begin
-        mult_norm_rnd = 16'h7FFF;
+        mult_norm_rnd = 16'h8001;
       end
       else
       begin
@@ -56,7 +56,7 @@ module MAC (input clk, rst,
   function [15:0] add_norm(input [15:0] A, B);
     begin
       reg [16:0] sum;
-      sum = A + B; 
+      sum = A + B;
 
       if(A[15] == 1'b1 && B[15] == 1'b1 && sum[15] == 1'b0)
       begin
